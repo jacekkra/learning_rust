@@ -1,4 +1,3 @@
-use anyhow::Result;
 use async_trait::async_trait;
 use email::{
     account::config::{passwd::PasswdConfig, AccountConfig},
@@ -13,6 +12,7 @@ use email::{
         Messages,
     },
     smtp::config::{SmtpAuthConfig, SmtpConfig, SmtpEncryptionKind},
+    Result,
 };
 use mail_send::{smtp::message::IntoMessage, SmtpClient, SmtpClientBuilder};
 use secret::Secret;

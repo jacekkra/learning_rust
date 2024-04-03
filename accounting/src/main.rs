@@ -1,19 +1,18 @@
-use anyhow::Result;
 use chrono::Datelike;
 use dotenvy::dotenv;
-use email::envelope::Id;
-use email::folder;
-use email::message::peek::PeekMessages;
-use email::message::Attachment;
+use email::{
+    envelope::Id,
+    folder,
+    message::{peek::PeekMessages, Attachment},
+    Result,
+};
 use mail_send::mail_builder::MessageBuilder;
-use std::env;
-use std::io;
+use std::{env, io};
 use tokio;
 
 mod proton_mail_bridge;
 
-use crate::proton_mail_bridge::ProtonMailBridge;
-use crate::proton_mail_bridge::ProtonMailBridgeBuilder;
+use crate::proton_mail_bridge::{ProtonMailBridge, ProtonMailBridgeBuilder};
 
 use log::LevelFilter;
 
