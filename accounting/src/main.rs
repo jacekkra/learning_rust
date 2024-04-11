@@ -14,7 +14,7 @@ mod proton_mail_bridge;
 
 use crate::proton_mail_bridge::{ProtonMailBridge, ProtonMailBridgeBuilder};
 
-use log::LevelFilter;
+use log::{log, Level, LevelFilter};
 
 async fn fetch_bank_statements_for_previous_month(
     bridge: &ProtonMailBridge,
@@ -26,7 +26,7 @@ async fn fetch_bank_statements_for_previous_month(
         "FROM kontakt@mbank.pl SUBJECT \"elektroniczne zestawienie operacji za\" SINCE {}",
         first_day_of_current_month.format("%d-%b-%Y")
     );
-    println!("{}", search_query);
+    log!(Level::Debug, "Searching: {}", search_query);
 
     let mailboxes_to_search = [folder::INBOX, folder::TRASH];
 
