@@ -21,7 +21,6 @@ dependencies = [
  "mail-send",
  "secret-lib",
  "tokio",
- "tokio-rustls 0.25.0",
 ]
 
 [[package]]

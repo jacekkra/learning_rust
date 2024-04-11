@@ -9,20 +9,21 @@ use email::{
     },
     message::{
         peek::{imap::PeekImapMessages, PeekMessages},
+        send::{smtp::SendSmtpMessage, SendMessage},
         Messages,
     },
-    smtp::config::{SmtpAuthConfig, SmtpConfig, SmtpEncryptionKind},
+    smtp::{
+        config::{SmtpAuthConfig, SmtpConfig, SmtpEncryptionKind},
+        SmtpContextBuilder, SmtpContextSync,
+    },
     Result,
 };
-use mail_send::{smtp::message::IntoMessage, SmtpClient, SmtpClientBuilder};
 use secret::Secret;
 use std::{collections::HashSet, sync::Arc};
-use tokio::net::TcpStream;
-use tokio_rustls::client::TlsStream;
 
 pub struct ProtonMailBridge {
     imap_context: ImapContextSync,
-    smtp_client: SmtpClient<TlsStream<TcpStream>>,
+    smtp_context: SmtpContextSync,
 }
 
 pub struct ProtonMailBridgeBuilder {
@@ -73,21 +74,13 @@ impl ProtonMailBridgeBuilder {
             .build()
             .await?;
 
-        // let smtp_context = SmtpContextBuilder::new(self.account_config, self.smtp_config.clone())
-        //     .build()
-        //     .await?;
-
-        let smtp_client =
-            SmtpClientBuilder::new(self.smtp_config.host.to_owned(), self.smtp_config.port)
-                .credentials(self.smtp_config.credentials().await?)
-                .implicit_tls(true)
-                .allow_invalid_certs()
-                .connect()
-                .await?;
+        let smtp_context = SmtpContextBuilder::new(self.account_config, self.smtp_config)
+            .build()
+            .await?;
 
         Ok(ProtonMailBridge {
             imap_context,
-            smtp_client,
+            smtp_context,
         })
     }
 }
@@ -101,14 +94,14 @@ impl PeekMessages for ProtonMailBridge {
     }
 }
 
-// #[async_trait]
-// impl SendMessage for ProtonMailBridge {
-//     async fn send_message(&mutself, msg: &[u8]) -> Result<()> {
-//         // SendSmtpMessage::new(&self.smtp_context)
-//         //     .send_message(msg)
-//         //     .await
-//     }
-// }
+#[async_trait]
+impl SendMessage for ProtonMailBridge {
+    async fn send_message(&self, msg: &[u8]) -> Result<()> {
+        SendSmtpMessage::new(&self.smtp_context)
+            .send_message(msg)
+            .await
+    }
+}
 
 impl ProtonMailBridge {
     pub async fn search(&self, mailbox: &str, query: &str) -> Result<HashSet<u32>> {
@@ -123,11 +116,5 @@ impl ProtonMailBridge {
                 |err| err.into(),
             )
             .await
-    }
-
-    pub async fn send_message<'x>(mut self, msg: impl IntoMessage<'x>) -> Result<()> {
-        self.smtp_client.send(msg).await?;
-
-        Ok(())
     }
 }

@@ -3,7 +3,7 @@ use dotenvy::dotenv;
 use email::{
     envelope::Id,
     folder,
-    message::{peek::PeekMessages, Attachment},
+    message::{peek::PeekMessages, send::SendMessage, Attachment},
     Result,
 };
 use mail_send::mail_builder::MessageBuilder;
@@ -71,9 +71,9 @@ async fn send_files(
         )
     });
 
-    // let message_bytes = message.write_to_vec().unwrap();
+    let message_bytes = message_with_attachments.write_to_vec().unwrap();
 
-    bridge.send_message(message_with_attachments).await
+    bridge.send_message(&message_bytes).await
 }
 
 #[tokio::main]

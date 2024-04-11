@@ -15,4 +15,3 @@ log = { version = "0.4", default-features = false }
 mail-send = { version = "0.4", default-features = false }
 secret-lib = { version = "0.3", default-features = false }
 tokio = { version = "1", default-features = false }
-tokio-rustls = { version = "0.25", default-features = false }
