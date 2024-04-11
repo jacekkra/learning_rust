@@ -6,7 +6,7 @@ use email::{
     message::{attachment::Attachment, peek::PeekMessages, send::SendMessage},
     AnyResult,
 };
-use mail_send::mail_builder::MessageBuilder;
+use mail_builder::MessageBuilder;
 use std::{env, io};
 use tokio;
 

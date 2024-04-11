@@ -18,7 +18,7 @@ dependencies = [
  "email-lib",
  "env_logger",
  "log",
- "mail-send",
+ "mail-builder",
  "secret-lib",
  "tokio",
 ]
