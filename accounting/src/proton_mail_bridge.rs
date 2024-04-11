@@ -16,7 +16,7 @@ use email::{
         config::{SmtpAuthConfig, SmtpConfig, SmtpEncryptionKind},
         SmtpContextBuilder, SmtpContextSync,
     },
-    Result,
+    AnyResult, Error,
 };
 use secret::Secret;
 use std::{collections::HashSet, sync::Arc};
@@ -69,7 +69,7 @@ impl ProtonMailBridgeBuilder {
 }
 
 impl ProtonMailBridgeBuilder {
-    pub async fn build(self) -> Result<ProtonMailBridge> {
+    pub async fn build(self) -> AnyResult<ProtonMailBridge> {
         let imap_context = ImapContextBuilder::new(self.account_config.clone(), self.imap_config)
             .build()
             .await?;
@@ -87,7 +87,7 @@ impl ProtonMailBridgeBuilder {
 
 #[async_trait]
 impl PeekMessages for ProtonMailBridge {
-    async fn peek_messages(&self, folder: &str, id: &Id) -> Result<Messages> {
+    async fn peek_messages(&self, folder: &str, id: &Id) -> AnyResult<Messages> {
         PeekImapMessages::new(&self.imap_context)
             .peek_messages(folder, id)
             .await
@@ -96,7 +96,7 @@ impl PeekMessages for ProtonMailBridge {
 
 #[async_trait]
 impl SendMessage for ProtonMailBridge {
-    async fn send_message(&self, msg: &[u8]) -> Result<()> {
+    async fn send_message(&self, msg: &[u8]) -> AnyResult<()> {
         SendSmtpMessage::new(&self.smtp_context)
             .send_message(msg)
             .await
@@ -104,7 +104,7 @@ impl SendMessage for ProtonMailBridge {
 }
 
 impl ProtonMailBridge {
-    pub async fn search(&self, mailbox: &str, query: &str) -> Result<HashSet<u32>> {
+    pub async fn search(&self, mailbox: &str, query: &str) -> AnyResult<HashSet<u32>> {
         let guard = &mut self.imap_context.lock().await;
 
         guard
@@ -113,8 +113,9 @@ impl ProtonMailBridge {
                     session.select(mailbox)?;
                     session.uid_search(&query)
                 },
-                |err| err.into(),
+                |err| Error::SearchEnvelopesImapError(err, mailbox.to_string(), query.to_string()),
             )
             .await
+            .map_err(Into::into)
     }
 }

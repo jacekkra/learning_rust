@@ -3,8 +3,8 @@ use dotenvy::dotenv;
 use email::{
     envelope::Id,
     folder,
-    message::{peek::PeekMessages, send::SendMessage, Attachment},
-    Result,
+    message::{attachment::Attachment, peek::PeekMessages, send::SendMessage},
+    AnyResult,
 };
 use mail_send::mail_builder::MessageBuilder;
 use std::{env, io};
@@ -18,7 +18,7 @@ use log::LevelFilter;
 
 async fn fetch_bank_statements_for_previous_month(
     bridge: &ProtonMailBridge,
-) -> Result<Vec<Attachment>> {
+) -> AnyResult<Vec<Attachment>> {
     let mut results = Vec::<Attachment>::new();
 
     let first_day_of_current_month = chrono::Utc::now().with_day(1).unwrap();
@@ -57,7 +57,7 @@ async fn send_files(
     from_address: &str,
     recipient_address: &str,
     attachments: Vec<Attachment>,
-) -> Result<()> {
+) -> AnyResult<()> {
     let message = MessageBuilder::new()
         .from(from_address)
         .to(recipient_address)
