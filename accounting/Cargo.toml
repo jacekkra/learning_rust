@@ -9,7 +9,7 @@ edition = "2021"
 async-trait = { version = "0.1", default-features = false }
 chrono = { version = "0.4", default-features = false }
 dotenvy = { version = "0.15", default-features = false }
-email-lib = { version = "0.23", default-features = false, features = ["imap", "maildir", "smtp"] }
+email-lib = { version = "0.24", default-features = false, features = ["imap", "maildir", "smtp"] }
 env_logger = { version = "0.11", default-features = false }
 log = { version = "0.4", default-features = false }
 mail-builder = { version = "0.3", default-features = false }
